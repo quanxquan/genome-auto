@@ -7,6 +7,30 @@ echo "=========================================="
 echo "基因组下载自动测试设置"
 echo "=========================================="
 
+# 检查 crontab 命令是否可用
+if ! command -v crontab &> /dev/null; then
+    echo "错误: 未找到 crontab 命令"
+    echo ""
+    echo "请根据系统类型安装 cron 服务:"
+    echo ""
+    echo "Ubuntu/Debian:"
+    echo "  sudo apt-get update"
+    echo "  sudo apt-get install cron"
+    echo ""
+    echo "CentOS/RHEL:"
+    echo "  sudo yum install cronie"
+    echo "  sudo systemctl enable crond"
+    echo "  sudo systemctl start crond"
+    echo ""
+    echo "Alpine Linux:"
+    echo "  sudo apk add dcron"
+    echo "  sudo rc-update add dcron"
+    echo "  sudo rc-service dcron start"
+    echo ""
+    echo "安装完成后重新运行此脚本"
+    exit 1
+fi
+
 # 检查是否以 root 身份运行
 if [ "$EUID" -eq 0 ]; then
     echo "警告: 检测到以 root 身份运行"
@@ -80,6 +104,12 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         crontab -l
     else
         echo "错误: Crontab 配置失败"
+        echo ""
+        echo "请尝试手动配置:"
+        echo "1. 运行: crontab -e"
+        echo "2. 添加以下行:"
+        echo "   $CRON_ENTRY"
+        echo "3. 保存并退出"
         exit 1
     fi
 else

@@ -64,6 +64,7 @@ chmod +x setup_cron.sh
 
 - Linux/macOS 系统
 - `wget` 命令（脚本会自动检查）
+- `crontab` 命令（用于自动测试功能）
 - 至少 1GB 可用磁盘空间
 - 稳定的网络连接
 
@@ -80,6 +81,26 @@ sudo yum install wget
 
 # macOS
 brew install wget
+```
+
+## 安装 cron 服务
+
+如果系统没有安装 cron 服务，请根据系统类型安装：
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install cron
+
+# CentOS/RHEL
+sudo yum install cronie
+sudo systemctl enable crond
+sudo systemctl start crond
+
+# Alpine Linux
+sudo apk add dcron
+sudo rc-update add dcron
+sudo rc-service dcron start
 ```
 
 ## 测试模式说明
@@ -146,6 +167,30 @@ brew install wget
 - 检查 crontab 配置：`crontab -l`
 - 查看日志文件：`tail -f ~/genome_test_logs/genome_test_$(date +%Y%m%d).log`
 - 手动运行测试：`./download_genome.sh`
+- 检查 cron 服务状态：
+  ```bash
+  # Ubuntu/Debian
+  sudo systemctl status cron
+  
+  # CentOS/RHEL
+  sudo systemctl status crond
+  
+  # Alpine Linux
+  sudo rc-service dcron status
+  ```
+
+### crontab 命令不存在
+如果提示 `crontab: command not found`，请安装 cron 服务：
+```bash
+# Ubuntu/Debian
+sudo apt-get install cron
+
+# CentOS/RHEL
+sudo yum install cronie
+
+# Alpine Linux
+sudo apk add dcron
+```
 
 ### 停止自动测试
 ```bash
@@ -158,6 +203,41 @@ crontab -e
 ## 许可证
 
 本项目采用 MIT 许可证。基因组数据遵循 Ensembl 数据使用条款。
+
+## 快速开始
+
+### 最简单的使用方式
+
+```bash
+# 一键运行测试（推荐）
+curl -sSL https://raw.githubusercontent.com/quanxquan/genome-auto/auto/download_genome.sh | bash
+```
+
+### 设置每日自动测试
+
+```bash
+# 1. 下载设置脚本
+wget https://raw.githubusercontent.com/quanxquan/genome-auto/auto/setup_cron.sh
+chmod +x setup_cron.sh
+
+# 2. 运行设置（会自动检查并安装依赖）
+./setup_cron.sh
+```
+
+## 项目结构
+
+```
+genome-auto/
+├── download_genome.sh    # 主测试脚本
+├── setup_cron.sh        # 自动配置脚本
+├── README.md            # 使用说明
+└── .gitignore           # Git 忽略配置
+```
+
+## 分支说明
+
+- **main**: 原始下载脚本（保留文件）
+- **auto**: 自动测试脚本（删除文件）
 
 ## 贡献
 

@@ -1,0 +1,25 @@
+# 忽略基因组数据文件（文件太大，不适合存储在 Git 中）
+*.fa
+*.fa.gz
+*.fna
+*.fna.gz
+*.fasta
+*.fasta.gz
+
+# 忽略临时文件
+*.tmp
+*.temp
+*.log
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
+
+# 忽略编辑器文件
+*.swp
+*.swo
+*~
+
+# 忽略备份文件
+*.bak
+*.backup

@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# 基因组下载脚本
-# 用于下载人类基因组参考序列 (Homo sapiens GRCh38)
+# 基因组下载测试脚本
+# 用于测试服务器稳定性和下载速度
+# 下载人类基因组参考序列 (Homo sapiens GRCh38) 后自动删除
 # 文件大小约 850MB
 
 echo "=========================================="
-echo "开始下载人类基因组参考序列"
+echo "开始基因组下载测试"
+echo "用途: 测试服务器稳定性和下载速度"
 echo "=========================================="
 
 # 检查 wget 是否安装
@@ -18,6 +20,13 @@ if ! command -v wget &> /dev/null; then
 fi
 
 echo "✓ wget 命令检查通过"
+
+# 清理旧的测试目录（如果存在）
+if [ -d ~/genome ]; then
+    echo "清理旧的测试目录: ~/genome"
+    rm -rf ~/genome
+    echo "✓ 旧目录已清理"
+fi
 
 # 创建基因组目录
 echo "正在创建目录: ~/genome"
@@ -51,10 +60,13 @@ echo "文件来源: Ensembl FTP 服务器"
 echo "文件版本: GRCh38 (release-115)"
 echo "文件大小: 约 850MB"
 echo "下载地址: https://ftp.ensembl.org/pub/release-115/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+echo "测试模式: 下载完成后将自动删除文件"
 echo ""
 
-# 开始下载
+# 记录开始时间
+START_TIME=$(date +%s)
 echo "开始下载基因组文件..."
+echo "开始时间: $(date)"
 echo "注意: 由于文件较大，下载可能需要几分钟时间"
 echo ""
 
@@ -62,6 +74,10 @@ wget --progress=bar:force https://ftp.ensembl.org/pub/release-115/fasta/homo_sap
 
 # 检查下载是否成功
 if [ $? -eq 0 ]; then
+    # 计算下载时间
+    END_TIME=$(date +%s)
+    DOWNLOAD_TIME=$((END_TIME - START_TIME))
+    
     echo ""
     echo "=========================================="
     echo "下载完成!"
@@ -69,12 +85,30 @@ if [ $? -eq 0 ]; then
     echo "✓ 基因组文件下载成功"
     echo "文件位置: ~/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
     echo "文件大小: $(du -h ~/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz | cut -f1)"
+    echo "下载时间: ${DOWNLOAD_TIME} 秒"
+    echo "完成时间: $(date)"
     echo ""
-    echo "使用说明:"
-    echo "- 解压文件: gunzip Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
-    echo "- 查看文件: less Homo_sapiens.GRCh38.dna.primary_assembly.fa"
-    echo "- 构建索引: samtools faidx Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+    
+    # 计算下载速度
+    FILE_SIZE_BYTES=$(stat -c%s ~/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz 2>/dev/null || stat -f%z ~/genome/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz 2>/dev/null)
+    if [ $FILE_SIZE_BYTES -gt 0 ]; then
+        SPEED_MBPS=$(echo "scale=2; $FILE_SIZE_BYTES / 1024 / 1024 / $DOWNLOAD_TIME" | bc 2>/dev/null || echo "计算中...")
+        echo "下载速度: ${SPEED_MBPS} MB/s"
+    fi
     echo ""
+    
+    # 测试模式：删除下载的文件
+    echo "=========================================="
+    echo "测试模式：清理下载文件"
+    echo "=========================================="
+    echo "正在删除测试文件..."
+    rm -rf ~/genome
+    echo "✓ 测试文件已清理"
+    echo "✓ 目录 ~/genome 已删除"
+    echo ""
+    echo "测试完成！服务器稳定性和下载速度测试成功"
+    echo "总测试时间: ${DOWNLOAD_TIME} 秒"
+    
 else
     echo ""
     echo "=========================================="
@@ -82,6 +116,7 @@ else
     echo "=========================================="
     echo "错误: 基因组文件下载失败"
     echo "请检查网络连接或稍后重试"
+    echo "测试时间: $(( $(date +%s) - START_TIME )) 秒"
     exit 1
 fi
 

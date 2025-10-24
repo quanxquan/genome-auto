@@ -22,14 +22,14 @@
 ### 方法一：一键远程执行（推荐）
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/download_genome.sh | bash
+curl -sSL https://raw.githubusercontent.com/quanxquan/genome-auto/main/download_genome.sh | bash
 ```
 
 ### 方法二：本地执行
 
 1. 下载脚本：
 ```bash
-wget https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/download_genome.sh
+wget https://raw.githubusercontent.com/quanxquan/genome-auto/main/download_genome.sh
 ```
 
 2. 添加执行权限：
